@@ -5,6 +5,10 @@ import Camera from './components/Camera';
 
 export default function App() {
   return (
+    <Camera />
+  );
+  
+  return (
     <View style={styles.container}>
       <Camera />
       <Text>Open up App.js to start working on your app!</Text>
