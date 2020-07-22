@@ -15,6 +15,35 @@ async function alertIfRemoteNotificationsDisabledAsync() {
     }
 }
 
+const URL = 'http://192.168.2.72:8080/upload';
+
+const uploadFile = async (path) => {
+    const data = new FormData();
+    // data.append('name', 'theFile');
+    const name = path.substr(path.lastIndexOf('/') + 1);
+    alert("name " + name);
+    data.append('theFile', {
+        type: 'video/mp4',
+        uri: path,
+        name,
+    });
+
+    let res = await fetch(URL, {
+        method: 'post',
+        body: data,
+        heders: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
+    
+    let response = await res.text();
+    if (response.status === 1) {
+        alert(response.data);
+    } else {
+        alert('Error')
+    }
+};
+
 const CameraView = () => {
     let camRef = useRef(null);
     const [hasPermission, setHasPermission] = useState(null);
@@ -41,6 +70,7 @@ const CameraView = () => {
         if (mode === 'stopped') {
             camRef.recordAsync().then(data => {
                 alert(JSON.stringify(data, null, 4));
+                uploadFile(data.uri);
             }).catch(err => {
                 alert(JSON.stringify(err, null, 4));
             });
