@@ -106,20 +106,21 @@ class CameraView extends React.Component {
         }).catch(err => {
             alert(JSON.stringify(err, null, 4));
         });
+        this.setState({ mode: 'recording' });
     }
 
     stopRecording() {
         this.camRef.stopRecording();
+        this.setState({ mode: 'stopped' });
     }
 
     toggleRecording() {
+        const { mode } = this.state;
         if (mode === 'stopped') {
             this.startRecording();
-            this.setState({ mode: 'recording' });
         }
         if (mode === 'recording') {
             this.stopRecording();
-            this.setState({ mode: 'stopped' });
         }
     }
 
