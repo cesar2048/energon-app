@@ -1,11 +1,15 @@
 import React from 'react';
-import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import ScanCamera from '../components/ScanCamMock';
 
 class IntroScreen extends React.Component {
+    constructor(props, ...args) {
+        super(props, ...args);
+        this.navigation = props.navigation;
+    }
     onScanSuccess() {
-        alert('naviagte to capture screen');
+        // alert('naviagte to capture screen');
+        this.navigation.push('Profile');
     }
     render() {
         return (
@@ -20,8 +24,6 @@ class IntroScreen extends React.Component {
                     <Text style={styles.instructions}>Abre Audacity-Energon y haz click en el boton [conectar]
                     y escanea el código QR aqui</Text>
                 </View>
-    
-                <StatusBar style="light" />
             </View>
         );
     }
