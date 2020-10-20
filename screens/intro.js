@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import ScanCamera from '../components/ScanCamMock';
+import Depends from '../lib/depends';
 
 class IntroScreen extends React.Component {
     constructor(props, ...args) {
@@ -8,10 +8,11 @@ class IntroScreen extends React.Component {
         this.navigation = props.navigation;
     }
     onScanSuccess() {
-        // alert('naviagte to capture screen');
         this.navigation.push('Profile');
     }
     render() {
+        const ScanCamera = Depends.get('qrScan');
+
         return (
             <View
                 style={styles.container}

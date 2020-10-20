@@ -19,7 +19,6 @@ const URL = 'http://192.168.2.76:8080/upload';
 
 const uploadFile = async (path) => {
     const data = new FormData();
-    // data.append('name', 'theFile');
     const name = path.substr(path.lastIndexOf('/') + 1);
     alert("name " + name);
     data.append('theFile', {
@@ -134,9 +133,14 @@ class CameraView extends React.Component {
         if (hasPermission === false) {
             return <Text>No access to camera</Text>;
         }
+        
         return (
             <View style={{ flex: 1, borderColor: '#0F0', borderWidth: 1 }}>
-                <Camera style={{ flex: 15 }} type={type} ref={(ref) => this.camRef = ref} >
+                <Camera
+                    style={{ flex: 1 }}
+                    type={type}
+                    ref={(ref) => this.camRef = ref}
+                >
                     <View
                         style={{
                             flex: 1,
