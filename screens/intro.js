@@ -33,7 +33,7 @@ class IntroScreen extends React.Component {
 const styles = StyleSheet.create({
     experiment: {
         width: 250,
-        height: 250,
+        minHeight: 400,
     },
     container: {
         flex: 1,

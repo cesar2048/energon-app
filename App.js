@@ -11,8 +11,10 @@ import RecordingScreen from './screens/recording';
 
 // injected dependencies
 import Depends from './lib/depends';
-import ScanCam from './components/ScanCamMock';
+import ScanCamMock from './components/ScanCamMock';
+import ScanCam from './components/ScanCam';
 import Camera from './components/Camera';
+
 Depends.register('qrScan', ScanCam);
 Depends.register('recCam', Camera);
 
