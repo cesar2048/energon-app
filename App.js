@@ -40,7 +40,7 @@ export default function App() {
           }}
         />
         <Stack.Screen
-          name="Profile"
+          name="Recording"
           component={RecordingScreen}
           options={{...opts}}
         />

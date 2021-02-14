@@ -15,9 +15,7 @@ async function alertIfRemoteNotificationsDisabledAsync() {
     }
 }
 
-const URL = 'http://192.168.2.76:8080/upload';
-
-const uploadFile = async (path) => {
+const uploadFile = async (path, url) => {
     const data = new FormData();
     const name = path.substr(path.lastIndexOf('/') + 1);
     alert("name " + name);
@@ -27,7 +25,7 @@ const uploadFile = async (path) => {
         name,
     });
 
-    let res = await fetch(URL, {
+    let res = await fetch(url, {
         method: 'post',
         body: data,
         heders: {
@@ -73,14 +71,19 @@ class HandlerServer {
 
 
 class CameraView extends React.Component {
-    constructor(...args) {
-        super(...args);
+    constructor(props, ...rest) {
+        super(props, ...rest);
         this.state = {
             mode: 'stopped',
             hasPermission: false,
         }
+        
+        const { connectionInfo } = props;
+        alert(JSON.stringify(connectionInfo.addresses, null, 4));
+        
         this.camRef = React.createRef();
-        this.srv = new HandlerServer('192.168.2.76:8080', this);
+        this.serverHost = `${connectionInfo.addresses[0]}:8080`;
+        this.srv = new HandlerServer(this.serverHost, this);
     }
 
     componentDidMount() {
@@ -100,8 +103,9 @@ class CameraView extends React.Component {
             quality: '1080p',
         };
         this.camRef.recordAsync(options).then(data => {
-            alert(JSON.stringify(data, null, 4));
-            uploadFile(data.uri);
+            const targetUrl = `http://${this.serverHost}/upload`;
+            alert('uploading file to: ' + targetUrl + ', file: ' + JSON.stringify(data, null, 4));
+            uploadFile(data.uri, targetUrl);
         }).catch(err => {
             alert(JSON.stringify(err, null, 4));
         });

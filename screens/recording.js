@@ -8,10 +8,11 @@ class IntroScreen extends React.Component {
     }
     render() {
         const ScanCamera = Depends.get('recCam');
+        const { params:connectionInfo } = this.props.route;
 
         return (
             <View style={styles.container}>
-                <ScanCamera />
+                <ScanCamera connectionInfo={connectionInfo} />
             </View>
         );
     }

@@ -6,9 +6,14 @@ class IntroScreen extends React.Component {
     constructor(props, ...args) {
         super(props, ...args);
         this.navigation = props.navigation;
+        this.isNavigated = false;
     }
-    onScanSuccess() {
-        this.navigation.push('Profile');
+    onScanSuccess(connectionInfo) {
+        if (!this.isNavigated) {
+            this.navigation.push('Recording', connectionInfo);
+        } else {
+            alert('Aborting second navigation to Recording');
+        }
     }
     render() {
         const ScanCamera = Depends.get('qrScan');
