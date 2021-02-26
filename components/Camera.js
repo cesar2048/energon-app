@@ -52,7 +52,7 @@ class HandlerServer {
         this.started = true;
         this.ws = new WebSocket(`ws://${this.host}/path`);
         this.ws.onopen = () => {
-            alert('connected to server');
+            // alert('connected to server');
         }
         this.ws.onmessage = (e) => {
             if (e.data == 'Start recording') {
@@ -79,7 +79,7 @@ class CameraView extends React.Component {
         }
         
         const { connectionInfo } = props;
-        alert(JSON.stringify(connectionInfo.addresses, null, 4));
+        // alert(JSON.stringify(connectionInfo.addresses, null, 4));
         
         this.camRef = React.createRef();
         this.serverHost = `${connectionInfo.addresses[0]}:8080`;
