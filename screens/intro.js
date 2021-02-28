@@ -16,12 +16,10 @@ class IntroScreen extends React.Component {
         this.isNavigated = false;
         this.state = {
             mode: Modes.WAITING,
-            lineas: [],
         }
     }
     onScanSuccess(connectionInfo) {
         this.setState({
-            lineas: this.state.lineas.concat(['scan success']),
             mode: Modes.NAVIGATING,
         }, function() {
             this.navigation.push('Recording', connectionInfo);
@@ -33,7 +31,7 @@ class IntroScreen extends React.Component {
     }
     render() {
         const ScanCamera = Depends.get('qrScan');
-        const { lineas, mode } = this.state;
+        const { mode } = this.state;
         const showCam = (mode === 'scan');
         const askToConnect = (mode === Modes.WAITING);
 
@@ -47,7 +45,6 @@ class IntroScreen extends React.Component {
                 <View>
                     <Text style={styles.instructions}>Abre Audacity-Energon y haz click en el boton [conectar]
                     y escanea el código QR aqui</Text>
-                    <Text style={styles.instructions}>{lineas.join('')}</Text>
                 </View>
             </View>
         );

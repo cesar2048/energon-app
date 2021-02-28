@@ -1,10 +1,19 @@
 import React from 'react';
+import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import Depends from '../lib/depends';
 
 class IntroScreen extends React.Component {
+    constructor(props, ... args) {
+        super(props, ...args);
+        this.navigation = props.navigation;
+    }
     onScanSuccess() {
         alert('naviagte to capture screen');
+    }
+    onDisconnect() {
+        this.navigation.pop();
+        alert('Server disconnected');
     }
     render() {
         const ScanCamera = Depends.get('recCam');
@@ -12,7 +21,11 @@ class IntroScreen extends React.Component {
 
         return (
             <View style={styles.container}>
-                <ScanCamera connectionInfo={connectionInfo} />
+                <ScanCamera
+                    connectionInfo={connectionInfo}
+                    onDisconnect={() => this.onDisconnect()}
+                />
+                <StatusBar hidden />
             </View>
         );
     }

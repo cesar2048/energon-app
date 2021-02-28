@@ -1,7 +1,6 @@
 // libraries
 import 'react-native-gesture-handler';
 import React from 'react';
-import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator, TransitionSpecs, CardStyleInterpolators } from '@react-navigation/stack';
 
@@ -45,7 +44,6 @@ export default function App() {
           options={{...opts}}
         />
       </Stack.Navigator>
-      <StatusBar style="auto" />
     </NavigationContainer>
   );
 }

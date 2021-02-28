@@ -7,15 +7,15 @@ import {
     StyleSheet
 } from 'react-native';
 import { Camera } from 'expo-camera';
-import * as Permissions from 'expo-permissions';
+// import * as Permissions from 'expo-permissions';
 
-async function alertIfRemoteNotificationsDisabledAsync() {
+/*async function alertIfRemoteNotificationsDisabledAsync() {
     const { status, ...rest } = await Permissions.askAsync(Permissions.AUDIO_RECORDING);
     if (status !== 'granted') {
         alert('Hey! You might want to enable notifications for my app, they are good...' + JSON.stringify(rest));
     }
 }
-
+*/
 const uploadFile = async (path, url) => {
     const data = new FormData();
     const name = path.substr(path.lastIndexOf('/') + 1);
@@ -34,8 +34,8 @@ const uploadFile = async (path, url) => {
         }
     });
     
-    let response = await res.json();
-    alert(JSON.stringify(response));
+    let response = await res.text();
+    return response;
 };
 
 class HandlerServer {
@@ -64,43 +64,49 @@ class HandlerServer {
                 alert(`Unknown message: ${e.data}`);
             }
         }
+        this.ws.onclose= () => {
+            this.controller.onServerDisconnected();
+        }
         this.ws.onerror = (e) => {
-            alert(`Ws:Error, ${e.message}`);
+            this.controller.onServerDisconnected();
+            // alert(`Ws:Error, ${e.message}`);
         }
     }
 }
 
-const toggleCamType = (type) => {
-    return (type === Camera.Constants.Type.back)
-        ? Camera.Constants.Type.front
-        : Camera.Constants.Type.back
-};
-
+const Modes = {
+    STOPPED: 'stopped',
+    RECORDING: 'recording',
+    UPLOADING: 'uploading',
+    INVALID: 'invalid',
+}
 
 class CameraView extends React.Component {
     constructor(props, ...rest) {
         super(props, ...rest);
         this.state = {
-            mode: 'stopped',
+            mode: Modes.STOPPED,
             hasPermission: false,
+            statusText: '',
         }
         
         const { connectionInfo } = props;
         
-        this.camRef = React.createRef();
         this.serverHost = `${connectionInfo.addresses[0]}:8080`;
+        this.camRef = React.createRef();
         this.srv = new HandlerServer(this.serverHost, this);
     }
 
     componentDidMount() {
         const fn = async () => {
             const { status } = await Camera.requestPermissionsAsync();
-            await alertIfRemoteNotificationsDisabledAsync();
-            this.setState({
-                hasPermission: status === 'granted',
-            });
+            const hasPermission = (status === 'granted');
+
+            // await alertIfRemoteNotificationsDisabledAsync();
+            this.setState({ hasPermission });
         }
         fn();
+        
         this.srv.start();
     }
 
@@ -108,40 +114,61 @@ class CameraView extends React.Component {
         const options = {
             quality: '1080p',
         };
-        this.camRef.recordAsync(options).then(data => {
+        this.camRef.recordAsync(options)
+        .then(data => {
             const targetUrl = `http://${this.serverHost}/upload`;
-            alert('uploading file to: ' + targetUrl + ', file: ' + JSON.stringify(data, null, 4));
-            uploadFile(data.uri, targetUrl);
+            this.setState({ mode: Modes.UPLOADING, statusText:  `Uploading file to server... ${JSON.stringify(data)}`})
+            return uploadFile(data.uri, targetUrl);
+        }).then(result => {
+            this.setState({ mode: Modes.STOPPED, statusText:  '' });
         }).catch(err => {
-            alert(JSON.stringify(err, null, 4));
+            throw err;
         });
-        this.setState({ mode: 'recording' });
+
+        this.setState({ mode: Modes.RECORDING });
     }
 
     stopRecording() {
         this.camRef.stopRecording();
-        this.setState({ mode: 'stopped' });
+        this.setState({ mode: Modes.STOPPED });
     }
 
     toggleRecording() {
         const { mode } = this.state;
-        if (mode === 'stopped') {
+        if (mode === Modes.STOPPED) {
             this.startRecording();
         }
-        if (mode === 'recording') {
+        if (mode === Modes.RECORDING) {
             this.stopRecording();
+        }
+    }
+
+    onServerDisconnected() {
+        const { mode } = this.state;
+        if (mode != Modes.INVALID) {
+            this.setState({
+                mode: Modes.INVALID
+            }, function() {
+                const { onDisconnect } = this.props;
+                if (typeof onDisconnect === 'function') {
+                    onDisconnect();
+                }
+            });
         }
     }
 
     render() {
         const type = Camera.Constants.Type.back;
-        const { hasPermission, mode } = this.state;
+        const { hasPermission, mode, statusText } = this.state;
 
         if (hasPermission === null) {
             return <Text>Fallo al consultar permisos</Text>;
         }
         if (hasPermission === false) {
             return <Text>No se concedió permiso para usar la cámara</Text>;
+        }
+        if (mode === Modes.INVALID) {
+            return <Text>Component invalid</Text>;
         }
         
         return (
@@ -151,8 +178,9 @@ class CameraView extends React.Component {
                     type={type}
                     ref={(ref) => this.camRef = ref}
                 >
-                    <View
-                        style={styles.cameraInsideContainer}>
+                    <View style={styles.cameraInsideContainer}>
+                        <Text style={styles.statusText}>{statusText}</Text>
+                        <Text style={styles.modeText}>{mode}</Text>
                         <TouchableOpacity
                             style={styles.flipButton}
                             onPress={() => {this.toggleRecording()}}>
@@ -183,6 +211,14 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: 'transparent',
         flexDirection: 'row',
+    },
+    statusText: {
+        fontSize: 18,
+        color: 'white'
+    },
+    modeText: {
+        fontSize: 18,
+        color: 'red'
     },
     flipButton: {
         flex: 0.3,
