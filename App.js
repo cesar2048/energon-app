@@ -35,7 +35,7 @@ export default function App() {
           name="Home"
           component={IntroScreen}
           options={{
-            title: 'Welcome',
+            title: 'Energon',
             ...opts
           }}
         />

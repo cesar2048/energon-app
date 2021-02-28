@@ -1,9 +1,10 @@
 import React from 'react'
 import {
+    TouchableOpacity,
     View,
     Text,
-    TouchableOpacity,
     Button,
+    StyleSheet
 } from 'react-native';
 import { Camera } from 'expo-camera';
 import * as Permissions from 'expo-permissions';
@@ -69,6 +70,12 @@ class HandlerServer {
     }
 }
 
+const toggleCamType = (type) => {
+    return (type === Camera.Constants.Type.back)
+        ? Camera.Constants.Type.front
+        : Camera.Constants.Type.back
+};
+
 
 class CameraView extends React.Component {
     constructor(props, ...rest) {
@@ -79,7 +86,6 @@ class CameraView extends React.Component {
         }
         
         const { connectionInfo } = props;
-        // alert(JSON.stringify(connectionInfo.addresses, null, 4));
         
         this.camRef = React.createRef();
         this.serverHost = `${connectionInfo.addresses[0]}:8080`;
@@ -132,48 +138,63 @@ class CameraView extends React.Component {
         const { hasPermission, mode } = this.state;
 
         if (hasPermission === null) {
-            return <Text>No se nada</Text>;
+            return <Text>Fallo al consultar permisos</Text>;
         }
         if (hasPermission === false) {
-            return <Text>No access to camera</Text>;
+            return <Text>No se concedió permiso para usar la cámara</Text>;
         }
         
         return (
-            <View style={{ flex: 1, borderColor: '#0F0', borderWidth: 1 }}>
+            <View style={styles.container}>
                 <Camera
-                    style={{ flex: 1 }}
+                    style={styles.camera}
                     type={type}
                     ref={(ref) => this.camRef = ref}
                 >
                     <View
-                        style={{
-                            flex: 1,
-                            backgroundColor: 'transparent',
-                            flexDirection: 'row',
-                        }}>
+                        style={styles.cameraInsideContainer}>
                         <TouchableOpacity
-                            style={{
-                                flex: 0.1,
-                                alignSelf: 'flex-end',
-                                alignItems: 'center',
-                            }}
-                            onPress={() => {
-                                setType(
-                                    type === Camera.Constants.Type.back
-                                        ? Camera.Constants.Type.front
-                                        : Camera.Constants.Type.back
-                                );
-                            }}>
-                            <Text style={{ fontSize: 18, marginBottom: 10, color: 'white' }}> Flip </Text>
+                            style={styles.flipButton}
+                            onPress={() => {this.toggleRecording()}}>
+                            <Text style={styles.flipButtonText}> Grabar </Text>
                         </TouchableOpacity>
                     </View>
                 </Camera>
-                <View style={{ flex: 1 }}>
+                {null && <View style={{ flex: 1 }}>
                     <Button onPress={() => this.toggleRecording()} title={mode === 'stopped' ? 'Grabar' : 'Detener'} />
-                </View>
+                </View>}
             </View>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        borderColor: '#0F0',
+        borderWidth: 1
+    },
+    camera: {
+        // flex: 1,
+        width: '100%',
+        height: '100%'
+    },
+    cameraInsideContainer: {
+        flex: 1,
+        backgroundColor: 'transparent',
+        flexDirection: 'row',
+    },
+    flipButton: {
+        flex: 0.3,
+        alignSelf: 'flex-end',
+        alignItems: 'center',
+    },
+    flipButtonText: {
+        fontSize: 18,
+        marginBottom: 10,
+        color: 'white'
+    }
+});
+
 
 export default CameraView;

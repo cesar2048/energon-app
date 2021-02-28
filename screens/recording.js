@@ -20,10 +20,11 @@ class IntroScreen extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
-        borderColor: '#24232B',
-        borderWidth: 1,
-        width: '100%',
-        height: '100%'
+        flex: 1,
+        flexDirection: 'row',
+        backgroundColor: '#24232B',
+        alignItems: 'center',
+        // padding: 10
     },
 });
 
