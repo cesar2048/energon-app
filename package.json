@@ -1,5 +1,7 @@
 {
   "main": "node_modules/expo/AppEntry.js",
+  "name": "energon-app",
+  "icon": "./assets/energon-app-logo.png",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
